@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+<ScrollView android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+<LinearLayout
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            android:layout_gravity="center"
+            android:id="@+id/iv_details_view"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Title:"
+            android:paddingTop="8dp"
+            android:gravity="center"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:gravity="center"
+            android:textSize="32sp"
+            android:textColor="#000000"
+            android:id="@+id/tv_movie_title"/>
+
+        <View style="@style/Divider"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Overview:"
+        android:paddingTop="8dp"
+        android:gravity="center"/>
+
+
+         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_overview"
+            android:textSize = "22sp"
+            android:paddingTop="8dp"
+             android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:paddingBottom="16dp"
+        />
+
+         <View style="@style/Divider"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Release Date:"
+            android:paddingTop="8dp"
+            android:gravity="center"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_release_date"
+            android:textSize="24sp"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:paddingBottom="16dp"
+            />
+
+        <View style="@style/Divider"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Vote Average:"
+        android:paddingTop="8dp"
+        android:gravity="center"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_vote_average"
+        android:textSize="24sp"
+        android:gravity="center"
+        android:paddingTop="16dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:paddingBottom="16dp"
+        />
+
+
+
+</LinearLayout>
+
+</ScrollView>
+
+
