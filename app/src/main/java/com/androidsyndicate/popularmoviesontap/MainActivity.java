@@ -50,9 +50,9 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
 
         mLayoutManager = new GridLayoutManager(this, 2);
 
-        URL url = NetworkUtils.buildPopularMoviesUrl();
+        URL url = NetworkUtils.buildMovieUrl(NetworkUtils.POPULAR_PATH);
         isMostPopular = true;
-        showProgressBar();
+
         new MoviePosterTask().execute(url);
 
     }
@@ -64,16 +64,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
 
     public void cancelErrorMessage(){
         mErrorMessage.setVisibility(View.INVISIBLE);
-        mRecyclerView.setVisibility(View.VISIBLE);
-    }
-
-    public void showProgressBar(){
-        mProgressBar.setVisibility(View.VISIBLE);
-        mRecyclerView.setVisibility(View.INVISIBLE);
-    }
-
-    public void cancelProgressBar(){
-        mProgressBar.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
@@ -92,13 +82,13 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
         switch(item.getItemId()) {
             case R.id.most_rated:
                 isMostPopular = false;
-                URL tmdbTopRated = NetworkUtils.buildTopRatedMovieUrl();
+                URL tmdbTopRated = NetworkUtils.buildMovieUrl(NetworkUtils.TOP_RATED_PATH);
                 new MoviePosterTask().execute(tmdbTopRated);
                 return true;
 
             case R.id.most_popular:
                 isMostPopular=true;
-                URL tmdbMostPopular = NetworkUtils.buildPopularMoviesUrl();
+                URL tmdbMostPopular = NetworkUtils.buildMovieUrl(NetworkUtils.POPULAR_PATH);
                 new MoviePosterTask().execute(tmdbMostPopular);
                 return true;
         }
@@ -144,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
 
         @Override
         protected void onPostExecute(ArrayList<String> moviePosters){
-            cancelProgressBar();
+            //cancelProgressBar();
             if(moviePosters != null) {
                 cancelErrorMessage();
                 Context context = getApplicationContext();

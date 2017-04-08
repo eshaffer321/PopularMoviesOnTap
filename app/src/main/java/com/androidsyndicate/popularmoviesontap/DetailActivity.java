@@ -46,17 +46,16 @@ public class DetailActivity extends Activity {
         mMovieVoteAverage = (TextView)findViewById(R.id.tv_vote_average);
 
 
-
         Intent intent = getIntent();
         isMostPopular = intent.getBooleanExtra(MainActivity.MOST_POPULAR, false);
         movieIndex = intent.getStringExtra(MainActivity.MOVIE_INDEX);
 
         if(isMostPopular){
-           URL mostPopularUrl = NetworkUtils.buildPopularMoviesUrl();
+           URL mostPopularUrl = NetworkUtils.buildMovieUrl(NetworkUtils.POPULAR_PATH);
            new GetMovieDetails().execute(mostPopularUrl);
         }
         else{
-            URL topRatedUrl = NetworkUtils.buildTopRatedMovieUrl();
+            URL topRatedUrl = NetworkUtils.buildMovieUrl(NetworkUtils.TOP_RATED_PATH);
             new GetMovieDetails().execute(topRatedUrl);
         }
 

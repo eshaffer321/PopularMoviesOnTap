@@ -1,6 +1,5 @@
 package com.androidsyndicate.popularmoviesontap;
 
-
 import android.net.Uri;
 import android.util.Log;
 
@@ -20,9 +19,9 @@ import java.net.URL;
 public class NetworkUtils {
 
     private final static String QUERY_PARAM_API = "api_key";
-    private final static String API_KEY = "65b0f0c1dca6b0957d34d1fceaf3107a";
+    private final static String API_KEY = "";
 
-    //consider a different method to use different languages
+
     private final static String QUERY_PARAM_LANG = "language";
     private final static String LANGUAGE = "en-US";
 
@@ -39,6 +38,9 @@ public class NetworkUtils {
     public final static String MY_TAG = "NetworkUtils";
 
 
+    public final static String POPULAR_PATH = "popular";
+    public final static String TOP_RATED_PATH = "top_rated";
+
 
     /**********************
      * Builds a Uri for an API call to TMDB for the most popular movies.
@@ -47,28 +49,13 @@ public class NetworkUtils {
      * @return url
      *
      */
-    public static URL buildPopularMoviesUrl() {
+    public static URL buildMovieUrl(String path){
         Uri uri = Uri
                 .parse(BASE_URL)
                 .buildUpon()
                 .appendPath("3")
                 .appendPath("movie")
-                .appendPath("popular")
-                .appendQueryParameter(QUERY_PARAM_API, API_KEY)
-                .appendQueryParameter(QUERY_PARAM_LANG, LANGUAGE)
-                .appendQueryParameter(QUERY_PARAM_PAGE, PAGE)
-                .build();
-        URL url = convertToUrl(uri);
-        return url;
-    }
-
-    public static URL buildTopRatedMovieUrl(){
-        Uri uri = Uri
-                .parse(BASE_URL)
-                .buildUpon()
-                .appendPath("3")
-                .appendPath("movie")
-                .appendPath("top_rated")
+                .appendPath(path)
                 .appendQueryParameter(QUERY_PARAM_API,API_KEY)
                 .appendQueryParameter(QUERY_PARAM_LANG,LANGUAGE)
                 .appendQueryParameter(QUERY_PARAM_PAGE,PAGE)
@@ -134,8 +121,6 @@ public class NetworkUtils {
         return fullPosterUrl;
     }
 
-
-
     public static ArrayList<String> getImagePath(String responseFromHTTP) throws JSONException {
         ArrayList<String> imagePaths = new ArrayList<>();
         JSONObject mMainJSON = new JSONObject(responseFromHTTP);
@@ -150,37 +135,38 @@ public class NetworkUtils {
         return imagePaths;
     }
 
-
-
     public static Movie getMovieDetails(String index, String response) throws JSONException {
+        final String POSTER_PATH = "poster_path";
+        final String OVERVIEW = "overview";
+        final String RELEASE_DATE= "release_date";
+        final String MOVIE_ID = "id";
+        final String ORIGINAL_TITLE = "original_title";
+        final String VOTE_COUNT = "vote_count";
+        final String VOTE_AVERAGE = "vote_average";
+        final String BACKDROP_PATH = "backdrop_path";
+        final String RESULTS = "results";
+
+
         Movie currentMovieObject = new Movie();
         JSONObject mMainJSON = new JSONObject(response);
-        JSONArray mJSONMovieResults = mMainJSON.getJSONArray("results");
-
+        JSONArray mJSONMovieResults = mMainJSON.getJSONArray(RESULTS);
         JSONObject movie = mJSONMovieResults.getJSONObject(Integer.parseInt(index));
 
-        currentMovieObject.setPosterPath(movie.getString("poster_path"));
-        currentMovieObject.setOverview(movie.getString("overview"));
-        currentMovieObject.setReleaseDate(movie.getString("release_date"));
-        currentMovieObject.setMovieId(movie.getString("id"));
-        currentMovieObject.setTitle(movie.getString("original_title"));
+        currentMovieObject.setPosterPath(movie.getString(POSTER_PATH));
+        currentMovieObject.setOverview(movie.getString(OVERVIEW));
+        currentMovieObject.setReleaseDate(movie.getString(RELEASE_DATE));
+        currentMovieObject.setMovieId(movie.getString(MOVIE_ID));
+        currentMovieObject.setTitle(movie.getString(ORIGINAL_TITLE));
+        currentMovieObject.setVoteCount(movie.getInt(VOTE_COUNT));
+        currentMovieObject.setVoteAverage(movie.getDouble(VOTE_AVERAGE));
+        currentMovieObject.setMovieBackDropUrl(singleMoviePath(movie.getString(BACKDROP_PATH)));
 
-        currentMovieObject.setVoteCount(movie.getInt("vote_count"));
-        currentMovieObject.setVoteAverage(movie.getDouble("vote_average"));
-        currentMovieObject.setMovieBackDropUrl(singleMoviePath(movie.getString("backdrop_path")));
-
-        Log.v(MY_TAG, currentMovieObject.toString());
-
+        //these items are not available unless calling TMDB with movie ID
         //currentMovieObject.setBudget(movie.getInt("budget"));
         //currentMovieObject.setRunTime(movie.getInt("runtime"));
         //currentMovieObject.setTagLine(movie.getString("tagline"));
 
-
-
-
-
         return currentMovieObject;
-
     }
 
 

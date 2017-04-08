@@ -68,7 +68,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         }
 
         void bind(String url) {
-            Picasso.with(mContext).load(url).fit().into(mImageItemView);
+            Picasso.with(mContext).load(url).placeholder(R.drawable.loading)
+                    .error(R.drawable.error).fit()
+                    .into(mImageItemView);
         }
 
 
