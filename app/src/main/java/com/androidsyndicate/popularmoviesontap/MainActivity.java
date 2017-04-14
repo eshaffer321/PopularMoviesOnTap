@@ -2,11 +2,12 @@ package com.androidsyndicate.popularmoviesontap;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.res.Configuration;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,12 +15,15 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import org.json.JSONException;
-import org.w3c.dom.Text;
-
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements ImageAdapter.ListItemClickListener{
     private final String MAIN_TAG = "MainActivity";
@@ -39,21 +43,43 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         mErrorMessage= (TextView)findViewById(R.id.tv_error_message);
         mProgressBar = (ProgressBar)findViewById(R.id.pb_grid_view);
-
 
         mRecyclerView = (RecyclerView)findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
-        mLayoutManager = new GridLayoutManager(this, 2);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            mLayoutManager = new GridLayoutManager(this, 2);
+        }
+        else{
+            mLayoutManager = new GridLayoutManager(this, 3);
+        }
 
-        URL url = NetworkUtils.buildMovieUrl(NetworkUtils.POPULAR_PATH);
-        isMostPopular = true;
 
-        new MoviePosterTask().execute(url);
+        Retrofit.Builder builder = new Retrofit.Builder()
+                .baseUrl(NetworkUtils.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create());
+        Retrofit retrofit = builder.build();
+        MovieApi client = retrofit.create(MovieApi.class);
+        Call<List<Movie>> call = client.listOfMovies(NetworkUtils.POPULAR_PATH,
+                                BuildConfig.OPEN_WEATHER_MAP_API_KEY,
+                                NetworkUtils.LANGUAGE,
+                                NetworkUtils.PAGE);
+        call.enqueue(new Callback<List<Movie>>() {
+            @Override
+            public void onResponse(Call<List<Movie>> call, Response<List<Movie>> response) {
+                List<Movie> movies = response.body();
+            }
+
+            @Override
+            public void onFailure(Call<List<Movie>> call, Throwable t) {
+
+            }
+        });
+
+        new FetchMovieTask(this, new FetchMovieTaskListener()).execute(url);
+
 
     }
 
@@ -83,13 +109,13 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
             case R.id.most_rated:
                 isMostPopular = false;
                 URL tmdbTopRated = NetworkUtils.buildMovieUrl(NetworkUtils.TOP_RATED_PATH);
-                new MoviePosterTask().execute(tmdbTopRated);
+                new FetchMovieTask(this, new FetchMovieTaskListener()).execute(tmdbTopRated);
                 return true;
 
             case R.id.most_popular:
                 isMostPopular=true;
                 URL tmdbMostPopular = NetworkUtils.buildMovieUrl(NetworkUtils.POPULAR_PATH);
-                new MoviePosterTask().execute(tmdbMostPopular);
+                new FetchMovieTask(this, new FetchMovieTaskListener()).execute(tmdbMostPopular);
                 return true;
         }
         return true;
@@ -111,29 +137,10 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
      * Takes the popular movie formed URL and makes a connection in the background
      * Gets the HTTP in String format.
      */
-    public class MoviePosterTask extends AsyncTask<URL,Void,ArrayList<String>>{
-
+    public class FetchMovieTaskListener implements AsyncTaskCompleteListener<ArrayList<String>> {
+        private final String TAGARINO = "FetchMovieTaskListener";
         @Override
-        protected ArrayList<String> doInBackground(URL... urls) {
-
-            URL url = urls[0];
-            try {
-                String response = NetworkUtils.getResponseFromHTTP(url);
-                if(response != null) {
-                    return NetworkUtils.getImagePath(response);
-                }
-                return null;
-            }
-            catch (IOException | JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-
-
-        @Override
-        protected void onPostExecute(ArrayList<String> moviePosters){
+        public void onJobComplete(ArrayList<String> moviePosters){
             //cancelProgressBar();
             if(moviePosters != null) {
                 cancelErrorMessage();
@@ -146,5 +153,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
                 showErrorMessage();
             }
         }
-    }//end MoviePosterTask class
+
+    }//end FetchMovieTaskListener class
+
 }//end MainActivity class

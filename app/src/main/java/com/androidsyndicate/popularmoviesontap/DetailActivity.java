@@ -96,6 +96,6 @@ public class DetailActivity extends Activity {
             mCurrentMovie = movie;
             buildMovieDetails();
         }
-    }//end MoviePosterTask class
+    }//end FetchMovieTaskListener class
 
 }
