@@ -132,6 +132,7 @@
                         android:paddingTop="@dimen/content_top_bottom_padding"
                         android:paddingBottom="@dimen/content_top_bottom_padding"
                         android:textColor="@color/content_color"
+                        tools:text="@string/lorem_ipsum"
                         />
 
                     <View style="@style/Divider"/>
@@ -155,6 +156,7 @@
                         android:paddingTop="@dimen/content_top_bottom_padding"
                         android:paddingBottom="@dimen/content_top_bottom_padding"
                         android:textColor="@color/content_color"
+                        tools:text="@string/lorem_ipsum"
                         />
                 </LinearLayout>
 

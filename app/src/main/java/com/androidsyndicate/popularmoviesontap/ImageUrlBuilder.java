@@ -1,18 +1,11 @@
 package com.androidsyndicate.popularmoviesontap;
 
-import com.androidsyndicate.popularmoviesontap.api.ApiInterface;
 import com.androidsyndicate.popularmoviesontap.model.MovieResults;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
-public class NetworkUtils {
+public class ImageUrlBuilder {
 
     public final static String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
     public final static String POSTER_IMAGE_SIZE = "w185/";
@@ -29,6 +22,10 @@ public class NetworkUtils {
         return imagePaths;
     }
 
-}//End NetworkUtils Class
+    public static String getBackDropUrl(String relativePath) {
+        return BASE_IMAGE_URL + BACKDROP_IMAGE_SIZE + relativePath;
+    }
+
+}//End ImageUrlBuilder Class
 
 

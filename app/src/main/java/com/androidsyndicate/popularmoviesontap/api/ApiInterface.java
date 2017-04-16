@@ -20,7 +20,7 @@ public interface ApiInterface {
 
     @GET("/3/movie/{movieId}")
     Call<MovieDetailsById> movieDetails(
-            @Path("id") int id,
+            @Path("movieId") int id,
             @Query("api_key") String apiKey,
             @Query("language") String language
     );

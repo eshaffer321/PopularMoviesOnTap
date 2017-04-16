@@ -13,13 +13,14 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.androidsyndicate.popularmoviesontap.NetworkTaskCompleteInterface;
-import com.androidsyndicate.popularmoviesontap.FetchMovieTask;
+import com.androidsyndicate.popularmoviesontap.ImageUrlBuilder;
+import com.androidsyndicate.popularmoviesontap.model.MovieDetailsById;
+import com.androidsyndicate.popularmoviesontap.network.FetchMovieByIdTask;
+import com.androidsyndicate.popularmoviesontap.network.NetworkTaskCompleteInterface;
+import com.androidsyndicate.popularmoviesontap.network.FetchMovieTask;
 import com.androidsyndicate.popularmoviesontap.adapter.ImageAdapter;
-import com.androidsyndicate.popularmoviesontap.NetworkUtils;
 import com.androidsyndicate.popularmoviesontap.R;
 import com.androidsyndicate.popularmoviesontap.api.ApiClient;
-import com.androidsyndicate.popularmoviesontap.model.MovieDetailsById;
 import com.androidsyndicate.popularmoviesontap.model.MovieResults;
 
 import java.util.List;
@@ -44,12 +45,15 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
     public static final int FLAG_POPULAR = 0;
     public static final int FLAG_TOP_RATED = 1;
     public static final int FLAG_FAVORITE = 2;
+
+    public static String MOVIE_DETAILS = "details";
     
     private int currentFlag;
     
     
     
     List<MovieResults.MovieDetails> list;
+    MovieDetailsById movieDetailsById;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
 
         mRecyclerView = (RecyclerView)findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
-        
+
 
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
             mLayoutManager = new GridLayoutManager(this, 2);
@@ -99,15 +103,19 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
     public boolean onOptionsItemSelected(MenuItem item){
         switch(item.getItemId()) {
             case R.id.top_rated:
-                currentFlag = FLAG_TOP_RATED;
+                if(currentFlag != FLAG_TOP_RATED){
+                    currentFlag = FLAG_TOP_RATED;
                 new FetchMovieTask(this, new FetchMovieTaskListener(),
                         ApiClient.getResultsClientCall(TOP_RATED)).getMovieResultsResponse();
+                }
                 return true;
 
             case R.id.most_popular:
-                currentFlag = FLAG_POPULAR;
-                new FetchMovieTask(this, new FetchMovieTaskListener(),
-                        ApiClient.getResultsClientCall(POPULAR)).getMovieResultsResponse();;
+                if(currentFlag != FLAG_POPULAR) {
+                    currentFlag = FLAG_POPULAR;
+                    new FetchMovieTask(this, new FetchMovieTaskListener(),
+                            ApiClient.getResultsClientCall(POPULAR)).getMovieResultsResponse();
+                }
                 return true;
         }
         return true;
@@ -119,18 +127,10 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
      */
     @Override
     public void onMoviePosterItemClick(int moviePosterIndex) {
-        Intent intent = new Intent(this,DetailActivity.class);
         int id = list.get(moviePosterIndex).getId();
         Call<MovieDetailsById> call = ApiClient.getMovieIdClientCall(id);
-        //new FetchMovieTask(this, new FetchMovieTaskListener(),
-         //       call);
-        //TODO: I might have to implement another interface and class if i wish to extract out
-        //TODO: the network call...
-        //TODO: make sure of parcelable to send the data from one activity to another?
-        startActivity(intent);
-
+        new FetchMovieByIdTask(new FetchMovieByIdTaskListener(), call).getMovieDetailsResponse();
     }
-
 
     public class FetchMovieTaskListener implements NetworkTaskCompleteInterface<List<MovieResults.MovieDetails>> {
        
@@ -140,10 +140,10 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
                 cancelErrorMessage();
                 list = movieDetails;
 
-                ImageAdapter myAdapter = new ImageAdapter(NetworkUtils.createImagePath(movieDetails),
+                ImageAdapter myAdapter = new ImageAdapter(ImageUrlBuilder.createImagePath(movieDetails),
                                          getApplicationContext(),
                                          MainActivity.this);
-                
+
                 mRecyclerView.setLayoutManager(mLayoutManager);
                 mRecyclerView.setAdapter(myAdapter);
             }
@@ -152,5 +152,17 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
             }
         }
     }//end FetchMovieTaskListener class
+
+    public class FetchMovieByIdTaskListener implements NetworkTaskCompleteInterface<MovieDetailsById>{
+
+        @Override
+        public void onJobComplete(MovieDetailsById movie){
+            movieDetailsById = movie;
+
+            Intent intent = new Intent(MainActivity.this,DetailActivity.class);
+            intent.putExtra(MOVIE_DETAILS, movieDetailsById);
+            startActivity(intent);
+        }
+    }
 
 }//end MainActivity class
