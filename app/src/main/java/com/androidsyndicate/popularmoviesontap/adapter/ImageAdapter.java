@@ -1,21 +1,22 @@
-package com.androidsyndicate.popularmoviesontap;
+package com.androidsyndicate.popularmoviesontap.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.androidsyndicate.popularmoviesontap.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
 
-    private ArrayList<String> mMovieUrls;
+    private List<String> mMovieUrls;
     private Context mContext;
     private static String MY_TAG = "ImageAdapter";
 
@@ -25,7 +26,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         void onMoviePosterItemClick(int moviePosterIndex);
     }
 
-    public ImageAdapter(ArrayList<String> list, Context context, ListItemClickListener listener) {
+    public ImageAdapter(List<String> list, Context context, ListItemClickListener listener) {
         mMovieUrls = list;
         mContext = context;
         mOnClickListener = listener;

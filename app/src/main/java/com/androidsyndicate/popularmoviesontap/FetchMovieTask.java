@@ -1,46 +1,75 @@
 package com.androidsyndicate.popularmoviesontap;
 
 import android.content.Context;
-import android.os.AsyncTask;
-import android.util.Log;
 
-import org.json.JSONException;
+import com.androidsyndicate.popularmoviesontap.model.MovieDetailsById;
+import com.androidsyndicate.popularmoviesontap.model.MovieResults;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
 
-public class FetchMovieTask extends AsyncTask<URL, Void, ArrayList<String>> {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class FetchMovieTask  {
+
     private final String MY_TAG = "FetchMovieTask";
     private Context context;
-    private AsyncTaskCompleteListener<ArrayList<String>> listener;
 
-    public FetchMovieTask(Context context, AsyncTaskCompleteListener<ArrayList<String>> listener){
+    private NetworkTaskCompleteInterface<List<MovieResults.MovieDetails>> listener;
+    private Call<MovieResults> call;
+
+    private NetworkTaskCompleteInterface<MovieDetailsById> idListener;
+    private Call<MovieDetailsById> idCall;
+
+
+
+
+    public FetchMovieTask(Context context,
+                          NetworkTaskCompleteInterface<List<MovieResults.MovieDetails>> listener,
+                          Call<MovieResults> call) {
         this.context = context;
         this.listener = listener;
+        this.call = call;
     }
 
-    @Override
-    protected ArrayList<String> doInBackground(URL... urls) {
+    public FetchMovieTask(NetworkTaskCompleteInterface<MovieDetailsById> listener,
+                          Call<MovieDetailsById> call){
+        idCall = call;
+        idListener = listener;
+    }
 
-        URL url = urls[0];
-        try {
-            String response = NetworkUtils.getResponseFromHTTP(url);
-            if(response != null) {
-                Log.v(MY_TAG, response);
-                return NetworkUtils.getImagePath(response);
+    public void getMovieResultsResponse() {
+        call.enqueue(new Callback<MovieResults>() {
+            @Override
+            public void onResponse(Call<MovieResults> call, Response<MovieResults> response) {
+                MovieResults movies = response.body();
+                List<MovieResults.MovieDetails> movieDetails = movies.getResults();
+                listener.onJobComplete(movieDetails);
             }
-            return null;
-        }
-        catch (IOException | JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
+
+            @Override
+            public void onFailure(Call<MovieResults> call, Throwable t) {
+                t.printStackTrace();
+            }
+
+        });
     }
 
-    @Override
-    protected void onPostExecute(ArrayList<String> results){
-        super.onPostExecute(results);
-        listener.onJobComplete(results);
+    public void getMovieDetailsResponse(){
+        idCall.enqueue(new Callback<MovieDetailsById>() {
+            @Override
+            public void onResponse(Call<MovieDetailsById> call, Response<MovieDetailsById> response) {
+                MovieDetailsById details = response.body();
+                idListener.onJobComplete(details);
+            }
+
+            @Override
+            public void onFailure(Call<MovieDetailsById> call, Throwable t) {
+
+            }
+        });
+
     }
-}
+
+}//end fetchmovietask class
