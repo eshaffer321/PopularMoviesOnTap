@@ -6,18 +6,22 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androidsyndicate.popularmoviesontap.model.DetailsOfMovie;
-import com.androidsyndicate.popularmoviesontap.model.ReviewResult;
-import com.androidsyndicate.popularmoviesontap.model.VideoResult;
+import com.androidsyndicate.popularmoviesontap.model.MovieResults;
+import com.androidsyndicate.popularmoviesontap.model.Reviews;
+import com.androidsyndicate.popularmoviesontap.model.Videos;
 import com.androidsyndicate.popularmoviesontap.utils.ImageUrlBuilder;
 import com.androidsyndicate.popularmoviesontap.R;
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 public class DetailActivity extends Activity {
 
-    private DetailsOfMovie mCurrentMovie;
-    private VideoResult mVideoResult;
-    private ReviewResult mReviewResult;
+    private List<MovieResults.MoviesBean> mListOfMovies;
+    private MovieResults.MoviesBean mMovieOfInterest;
+    private Reviews.ReviewBean mVideoResult;
+    private Videos.VideoBean mReviewResult;
+    private int mMovieIndex;
 
     private TextView mMovieTitle;
     private ImageView mMoviePoster;
@@ -33,6 +37,8 @@ public class DetailActivity extends Activity {
     //TODO(5): movies are stored in a content provider when user selects favorite
     //TODO(6): update the content provider when the user selects to (un)favorite
 
+    //TODO(7) Maybe use databinding instead of all the findview by ids...
+
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_activity);
@@ -44,26 +50,33 @@ public class DetailActivity extends Activity {
         mMovieVoteAverage = (TextView)findViewById(R.id.tv_vote_average);
 
         Intent intent = getIntent();
-        mCurrentMovie = intent.getParcelableExtra(MainActivity.MOVIE_DETAIL_TAG);
-        mVideoResult = intent.getParcelableExtra(MainActivity.MOVIE_VIDEO_TAG);
-        mReviewResult = intent.getParcelableExtra(MainActivity.MOVIE_REVIEWS_TAG);
+        mListOfMovies =  intent.getParcelableArrayListExtra(MainActivity.MOVIE_DETAIL_TAG);
+        mMovieIndex = intent.getIntExtra(MainActivity.MOVIE_INDEX_TAG, -1);
+
+        mMovieOfInterest = mListOfMovies.get(mMovieIndex);
+
+
+        //mVideoResult = intent.getParcelableExtra(MainActivity.MOVIE_VIDEO_TAG);
+        //mReviewResult = intent.getParcelableExtra(MainActivity.MOVIE_REVIEWS_TAG);
+
 
         buildMovieDetails();
 
     }
 
         private void buildMovieDetails(){
-            mMovieTitle.setText(mCurrentMovie.getTitle());
-            mMovieOverView.setText(mCurrentMovie.getOverview());
-            mMovieReleaseDate.setText(mCurrentMovie.getReleaseDate());
-            mMovieVoteAverage.setText(Double.toString(mCurrentMovie.getVoteAverage()));
+            mMovieTitle.setText(mMovieOfInterest.getTitle());
+            mMovieOverView.setText(mMovieOfInterest.getOverview());
+            mMovieReleaseDate.setText(mMovieOfInterest.getRelease_date());
+            mMovieVoteAverage.setText(Double.toString(mMovieOfInterest.getVote_average()));
 
-            String movieBackDropUrl = ImageUrlBuilder.getBackDropUrl(mCurrentMovie.getBackdropPath());
+            String movieBackDropUrl = ImageUrlBuilder.getBackDropUrl(mMovieOfInterest.getBackdrop_path());
 
             Picasso.with(getApplicationContext())
                     .load(movieBackDropUrl).fit()
                     .into(mMoviePoster);
         }
+
 
 
 }

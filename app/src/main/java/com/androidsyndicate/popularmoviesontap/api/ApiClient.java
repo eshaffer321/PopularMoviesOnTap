@@ -15,28 +15,39 @@ public class ApiClient {
     private final static String BASE_URL = "https://api.themoviedb.org";
     private final static String LANGUAGE = "en-US";
     private final static int PAGE = 1;
-    private static Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
-    private static ApiInterface client = retrofit.create(ApiInterface.class);
+    private static Retrofit retrofit;
+    private static ApiInterface client;
 
-    public static Call<MovieResults> getMovieListCall(String category){
-        return client.listOfMovies( category,
-                                    BuildConfig.TMDB_API_KEY,
-                                    LANGUAGE,PAGE);
+
+
+
+    public ApiClient(){
+        retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+         client = retrofit.create(ApiInterface.class);
 
     }
 
-    public static Call<Videos> getVideosCall(int id){
-        return client.movieVideos(id,
-                                  BuildConfig.TMDB_API_KEY,
-                                  LANGUAGE);
+    public Call<Reviews> getReviewCall(int movieId){
+        return client.movieReviews(movieId,
+                BuildConfig.TMDB_API_KEY,
+                LANGUAGE);
     }
 
-    public static Call<Reviews> getReviewsCall(int id){
-        return client.movieReviews(id,
-                                  BuildConfig.TMDB_API_KEY,
-                                  LANGUAGE);
+    public Call<MovieResults> getMovieListCall(String movieCategory){
+
+        return client.listOfMovies(movieCategory,
+                BuildConfig.TMDB_API_KEY,
+                LANGUAGE,PAGE);
     }
+
+    public Call<Videos> getVideoCall(int movieId){
+        return client.movieVideos(movieId,
+                BuildConfig.TMDB_API_KEY,
+                LANGUAGE);
+
+    }
+
 }

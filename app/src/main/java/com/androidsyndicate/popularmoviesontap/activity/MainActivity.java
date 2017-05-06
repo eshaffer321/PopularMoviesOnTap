@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,17 +15,15 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.androidsyndicate.popularmoviesontap.model.DetailsOfMovie;
-import com.androidsyndicate.popularmoviesontap.model.ReviewResult;
 import com.androidsyndicate.popularmoviesontap.model.Reviews;
 import com.androidsyndicate.popularmoviesontap.model.Videos;
-import com.androidsyndicate.popularmoviesontap.model.VideoResult;
 import com.androidsyndicate.popularmoviesontap.utils.ImageUrlBuilder;
 import com.androidsyndicate.popularmoviesontap.adapter.ImageAdapter;
 import com.androidsyndicate.popularmoviesontap.R;
 import com.androidsyndicate.popularmoviesontap.api.ApiClient;
 import com.androidsyndicate.popularmoviesontap.model.MovieResults;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -41,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
     private TextView mErrorMessage;
     private ProgressBar mProgressBar;
 
-    public static String MOVIE_INDEX = "index";
     public static String POPULAR = "popular";
     public static String TOP_RATED= "top_rated";
     
@@ -53,20 +51,23 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
     public static String MOVIE_REVIEWS_TAG = "movie-review-tag";
     public static String MOVIE_VIDEO_TAG = "movie-video-tag";
     public static String MOVIE_DETAIL_TAG = "movie-detail-tag";
+    public static String MOVIE_INDEX_TAG = "movie-index-tag";
     
     private int currentFlag;
     
-    
-    
-    List<DetailsOfMovie> detailOfMovies;
-    List<ReviewResult> reviewResult;
-    List<VideoResult> videoResult;
+    List<MovieResults.MoviesBean> mListOfMovies;
+    List<Reviews.ReviewBean> mListOfReviews;
+    List<Videos.VideoBean> mListOfVideos;
+    MovieResults mMovieResults;
+    ApiClient callClient;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        callClient = new ApiClient();
 
         mErrorMessage= (TextView)findViewById(R.id.tv_error_message);
         mProgressBar = (ProgressBar)findViewById(R.id.pb_grid_view);
@@ -132,17 +133,21 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
     }
 
     public void createImagePosters(String category){
-        Call<MovieResults> call = ApiClient.getMovieListCall(TOP_RATED);
+        Call<MovieResults> call = callClient.getMovieListCall(category);
+
         call.enqueue(new Callback<MovieResults>() {
             @Override
             public void onResponse(Call<MovieResults> call, Response<MovieResults> response) {
-                MovieResults movies = response.body();
-                List<DetailsOfMovie> movieDetails = movies.getDetailsOfMovies();
-                if(movieDetails != null) {
-                    cancelErrorMessage();
-                    detailOfMovies = movieDetails;
 
-                    ImageAdapter myAdapter = new ImageAdapter(ImageUrlBuilder.createImagePath(movieDetails),
+                 mMovieResults = response.body();
+                List<MovieResults.MoviesBean> listOfMovies = mMovieResults.getResults();
+
+
+                if(listOfMovies != null) {
+                    cancelErrorMessage();
+                    mListOfMovies = listOfMovies;
+
+                    ImageAdapter myAdapter = new ImageAdapter(ImageUrlBuilder.createImagePath(mListOfMovies),
                             getApplicationContext(),
                             MainActivity.this);
 
@@ -170,17 +175,16 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
     @Override
     public void onMoviePosterItemClick(int moviePosterIndex) {
         //TODO: Instead of the nested call, make it so we get the videos, as well as the reviews
-        int id = detailOfMovies.get(moviePosterIndex).getId();
+        int id = mListOfMovies.get(moviePosterIndex).getId();
 
-
-        Call<Videos> callVideos = ApiClient.getVideosCall(id);
-        Call<Reviews> callReviews = ApiClient.getReviewsCall(id);
+        Call<Videos> callVideos = callClient.getVideoCall(id);
+        Call<Reviews> callReviews = callClient.getReviewCall(id);
 
         callVideos.enqueue(new Callback<Videos>() {
             @Override
             public void onResponse(Call<Videos> call, Response<Videos> response) {
                 Videos videos = response.body();
-                videoResult = videos.getVideoResults();
+                mListOfVideos = videos.getResults();
             }
 
             @Override
@@ -193,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
             @Override
             public void onResponse(Call<Reviews> call, Response<Reviews> response) {
                 Reviews review = response.body();
-                reviewResult = review.getReviewResults();
+                mListOfReviews = review.getResults();
 
             }
 
@@ -203,13 +207,19 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
             }
         });
 
-
         Intent intent = new Intent(MainActivity.this,DetailActivity.class);
-        DetailsOfMovie movieOfInterest = detailOfMovies.get(moviePosterIndex);
-        intent.putExtra(MOVIE_VIDEO_TAG, (Parcelable) videoResult);
-        intent.putExtra(MOVIE_REVIEWS_TAG, (Parcelable) reviewResult);
-        intent.putExtra(MOVIE_DETAIL_TAG, movieOfInterest);
+
+        MovieResults.MoviesBean movieOfInterest = mListOfMovies.get(moviePosterIndex);
+
+        intent.putParcelableArrayListExtra(MOVIE_DETAIL_TAG, (ArrayList<? extends Parcelable>) mListOfMovies);
+        intent.putExtra(MOVIE_INDEX_TAG, moviePosterIndex);
         startActivity(intent);
+       // intent.putExtra(MOVIE_REVIEWS_TAG, (Parcelable) mListOfReviews);
+        //intent.putExtra(MOVIE_VIDEO_TAG, (Parcelable) mListOfVideos);
+
+
+
+
     }
 
 
