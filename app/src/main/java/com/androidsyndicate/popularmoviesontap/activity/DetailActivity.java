@@ -2,9 +2,14 @@ package com.androidsyndicate.popularmoviesontap.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.androidsyndicate.popularmoviesontap.adapter.ReviewAdapter;
 import com.androidsyndicate.popularmoviesontap.model.MovieResults;
 import com.androidsyndicate.popularmoviesontap.model.Reviews;
 import com.androidsyndicate.popularmoviesontap.model.Videos;
@@ -20,20 +25,18 @@ public class DetailActivity extends YouTubeBaseActivity {
 
     private List<MovieResults.MoviesBean> mListOfMovies;
     private MovieResults.MoviesBean mMovieOfInterest;
-    private Reviews.ReviewBean mReviewsResult;
-    private Videos.VideoBean mVideosResult;
+    private List<Reviews.ReviewBean> mReviewsResult;
+    private List<Videos.VideoBean> mVideosResult;
     private int mMovieIndex;
 
-    private TextView mMovieTitle;
-    private ImageView mMoviePoster;
-    private TextView mMovieOverView;
-    private TextView mMovieReleaseDate;
-    private TextView mMovieVoteAverage;
+    RecyclerView mRecyclerView;
+    LinearLayoutManager mLinearLayoutManager;
+
+
 
     private YouTubePlayerView youTubePlayerView;
     private YouTubePlayer.OnInitializedListener onInitializedListener;
 
-    private static String MY_LOG_TAG = "DetailActivity";
 
     //TODO(3):When a trailer is selected, use an intent to launch that trailer
     //TODO(4):When a user pressed a buttton, attached fab, it saves this movie as a favorite
@@ -47,57 +50,45 @@ public class DetailActivity extends YouTubeBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_activity);
 
-
-
-        //mMovieTitle = (TextView)findViewById(R.id.tv_movie_title);
-        ///mMoviePoster = (ImageView)findViewById(R.id.iv_details_view);
-       // mMovieOverView = (TextView)findViewById(R.id.tv_overview);
-        //mMovieReleaseDate = (TextView)findViewById(R.id.tv_release_date);
-       // mMovieVoteAverage = (TextView)findViewById(R.id.tv_vote_average);
-
-
-
+        //unpack the data
         Intent intent = getIntent();
-        mListOfMovies =  intent.getParcelableArrayListExtra(MainActivity.MOVIE_DETAIL_TAG);
-        mMovieIndex = intent.getIntExtra(MainActivity.MOVIE_INDEX_TAG, -1);
-        mMovieOfInterest = mListOfMovies.get(mMovieIndex);
+        if(intent != null) {
+            mListOfMovies = intent.getParcelableArrayListExtra(MainActivity.MOVIE_DETAIL_TAG);
+            mMovieIndex = intent.getIntExtra(MainActivity.MOVIE_INDEX_TAG, -1);
+            mMovieOfInterest = mListOfMovies.get(mMovieIndex);
+            mReviewsResult = intent.getParcelableArrayListExtra(MainActivity.MOVIE_REVIEWS_TAG);
+            mVideosResult = intent.getParcelableArrayListExtra(MainActivity.MOVIE_VIDEO_TAG);
 
-        mReviewsResult = intent.getParcelableExtra(MainActivity.MOVIE_VIDEO_TAG);
-        mVideosResult = intent.getParcelableExtra(MainActivity.MOVIE_REVIEWS_TAG);
-
-
-
-
-        youTubePlayerView = (YouTubePlayerView) findViewById(R.id.youtube_player_view);
-        onInitializedListener = new YouTubePlayer.OnInitializedListener() {
-            @Override
-            public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
-                //TODO:GET THE VIDEO PATH NEEDED
-                youTubePlayer.loadVideo(mVideosResult.getKey());
-            }
-
-            @Override
-            public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
-
-            }
-        };
-        buildMovieDetails();
-
-    }
-
-        private void buildMovieDetails(){
-            //mMovieTitle.setText(mMovieOfInterest.getTitle());
-           // mMovieOverView.setText(mMovieOfInterest.getOverview());
-            //mMovieReleaseDate.setText(mMovieOfInterest.getRelease_date());
-           // mMovieVoteAverage.setText(Double.toString(mMovieOfInterest.getVote_average()));
-
-            //String movieBackDropUrl = ImageUrlBuilder.getBackDropUrl(mMovieOfInterest.getBackdrop_path());
-
-            //Picasso.with(getApplicationContext())
-                    //.load(movieBackDropUrl).fit()
-                    //.into(mMoviePoster);
         }
 
+        //set up the recycler view
+        mRecyclerView = (RecyclerView) findViewById(R.id.review_recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        ReviewAdapter reviewAdapter = new ReviewAdapter(this,mReviewsResult);
+
+        //time for the layout manager
+        mLinearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
+        mRecyclerView.setAdapter(reviewAdapter);
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+
+        buildMovieDetails();
+    }
+
+    private void buildMovieDetails(){
+        //mMovieTitle.setText(mMovieOfInterest.getTitle());
+        //mMovieOverView.setText(mMovieOfInterest.getOverview());
+        //mMovieReleaseDate.setText(mMovieOfInterest.getRelease_date());
+        //mMovieVoteAverage.setText(Double.toString(mMovieOfInterest.getVote_average()));
+
+        //String movieBackDropUrl = ImageUrlBuilder.getBackDropUrl(mMovieOfInterest.getBackdrop_path());
+
+        //Picasso.with(getApplicationContext())
+        //.load(movieBackDropUrl).fit()
+        //.into(mMoviePoster);
+    }
 
 
+    public void launchYoutubeTrailer(View view) {
+
+    }
 }

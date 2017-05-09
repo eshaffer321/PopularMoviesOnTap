@@ -55,7 +55,21 @@ public class Reviews implements Parcelable {
         this.results = results;
     }
 
-    public static class ReviewBean {
+
+
+    protected Reviews(Parcel in) {
+        id = in.readInt();
+        page = in.readInt();
+        total_pages = in.readInt();
+        total_results = in.readInt();
+        if (in.readByte() == 0x01) {
+            results = new ArrayList<ReviewBean>();
+            in.readList(results, ReviewBean.class.getClassLoader());
+        } else {
+            results = null;
+        }
+    }
+    public static class ReviewBean implements Parcelable {
 
         private String id;
         private String author;
@@ -93,19 +107,39 @@ public class Reviews implements Parcelable {
         public void setUrl(String url) {
             this.url = url;
         }
-    }
 
-    protected Reviews(Parcel in) {
-        id = in.readInt();
-        page = in.readInt();
-        total_pages = in.readInt();
-        total_results = in.readInt();
-        if (in.readByte() == 0x01) {
-            results = new ArrayList<ReviewBean>();
-            in.readList(results, ReviewBean.class.getClassLoader());
-        } else {
-            results = null;
+        protected ReviewBean(Parcel in) {
+            id = in.readString();
+            author = in.readString();
+            content = in.readString();
+            url = in.readString();
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(id);
+            dest.writeString(author);
+            dest.writeString(content);
+            dest.writeString(url);
+        }
+
+        @SuppressWarnings("unused")
+        public static final Parcelable.Creator<ReviewBean> CREATOR = new Parcelable.Creator<ReviewBean>() {
+            @Override
+            public ReviewBean createFromParcel(Parcel in) {
+                return new ReviewBean(in);
+            }
+
+            @Override
+            public ReviewBean[] newArray(int size) {
+                return new ReviewBean[size];
+            }
+        };
     }
 
     @Override

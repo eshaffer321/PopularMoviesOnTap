@@ -1,57 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+<android.support.constraint.ConstraintLayout
+
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     style="@android:style/Theme.Material"
-    >
+    tools:layout_editor_absoluteY="0dp"
+    tools:layout_editor_absoluteX="0dp">
 
     <com.google.android.youtube.player.YouTubePlayerView
         android:layout_width="316dp"
         android:layout_height="202dp"
         android:id="@+id/youtube_player_view"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="25dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent">
-
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        tools:layout_editor_absoluteY="230dp"
+        tools:layout_editor_absoluteX="34dp">
     </com.google.android.youtube.player.YouTubePlayerView>
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="34dp"
-        tools:layout_editor_absoluteY="246dp" />
+    <include layout="@layout/movie_overview_details"
+        tools:layout_editor_absoluteY="199dp"
+        tools:layout_editor_absoluteX="-84dp" />
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="0dp"
+        android:layout_height="240dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        tools:layout_editor_absoluteX="172dp"
+        tools:layout_editor_absoluteY="453dp">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="34dp"
-        tools:layout_editor_absoluteY="283dp" />
+        <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="34dp"
-        tools:layout_editor_absoluteY="324dp" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="34dp"
-        tools:layout_editor_absoluteY="371dp" />
+            <include layout="@layout/reviews_layout" />
+        </ScrollView>
+    </FrameLayout>
 
 
 </android.support.constraint.ConstraintLayout>
+</ScrollView>

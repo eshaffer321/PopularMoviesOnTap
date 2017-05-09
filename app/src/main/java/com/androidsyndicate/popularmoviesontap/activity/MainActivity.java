@@ -174,7 +174,12 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
      */
     @Override
     public void onMoviePosterItemClick(int moviePosterIndex) {
-        //TODO: Instead of the nested call, make it so we get the videos, as well as the reviews
+        final Intent intent = new Intent(MainActivity.this,DetailActivity.class);
+
+        intent.putParcelableArrayListExtra(MOVIE_DETAIL_TAG, (ArrayList<? extends Parcelable>) mListOfMovies);
+        intent.putExtra(MOVIE_INDEX_TAG, moviePosterIndex);
+
+
         int id = mListOfMovies.get(moviePosterIndex).getId();
 
         Call<Videos> callVideos = callClient.getVideoCall(id);
@@ -185,6 +190,8 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
             public void onResponse(Call<Videos> call, Response<Videos> response) {
                 Videos videos = response.body();
                 mListOfVideos = videos.getResults();
+                intent.putParcelableArrayListExtra(MOVIE_VIDEO_TAG, (ArrayList<? extends Parcelable>) mListOfVideos);
+
             }
 
             @Override
@@ -198,6 +205,9 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
             public void onResponse(Call<Reviews> call, Response<Reviews> response) {
                 Reviews review = response.body();
                 mListOfReviews = review.getResults();
+                intent.putParcelableArrayListExtra(MOVIE_REVIEWS_TAG, (ArrayList<? extends Parcelable>) mListOfReviews);
+                startActivity(intent);
+
 
             }
 
@@ -206,19 +216,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.List
 
             }
         });
-
-        Intent intent = new Intent(MainActivity.this,DetailActivity.class);
-
-        MovieResults.MoviesBean movieOfInterest = mListOfMovies.get(moviePosterIndex);
-
-        intent.putParcelableArrayListExtra(MOVIE_DETAIL_TAG, (ArrayList<? extends Parcelable>) mListOfMovies);
-        intent.putExtra(MOVIE_INDEX_TAG, moviePosterIndex);
-        startActivity(intent);
-       // intent.putExtra(MOVIE_REVIEWS_TAG, (Parcelable) mListOfReviews);
-        //intent.putExtra(MOVIE_VIDEO_TAG, (Parcelable) mListOfVideos);
-
-
-
 
     }
 
