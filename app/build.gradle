@@ -21,6 +21,9 @@ android {
         it.buildConfigField 'String', 'TMDB_API_KEY', MyTMDBApiKey
         it.buildConfigField('String' ,'YOUTUBE_PLAYER_API_KEY', YouTubeDataKey)
     }
+    dataBinding{
+        enabled = true
+    }
 }
 
 

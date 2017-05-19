@@ -1,6 +1,7 @@
 package com.androidsyndicate.popularmoviesontap.activity;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidsyndicate.popularmoviesontap.adapter.ReviewAdapter;
+import com.androidsyndicate.popularmoviesontap.databinding.DetailActivityBinding;
 import com.androidsyndicate.popularmoviesontap.model.MovieResults;
 import com.androidsyndicate.popularmoviesontap.model.Reviews;
 import com.androidsyndicate.popularmoviesontap.model.Videos;
@@ -29,13 +31,8 @@ public class DetailActivity extends YouTubeBaseActivity {
     private List<Videos.VideoBean> mVideosResult;
     private int mMovieIndex;
 
-    RecyclerView mRecyclerView;
-    LinearLayoutManager mLinearLayoutManager;
+    DetailActivityBinding mDataBinding;
 
-
-
-    private YouTubePlayerView youTubePlayerView;
-    private YouTubePlayer.OnInitializedListener onInitializedListener;
 
 
     //TODO(3):When a trailer is selected, use an intent to launch that trailer
@@ -58,18 +55,11 @@ public class DetailActivity extends YouTubeBaseActivity {
             mMovieOfInterest = mListOfMovies.get(mMovieIndex);
             mReviewsResult = intent.getParcelableArrayListExtra(MainActivity.MOVIE_REVIEWS_TAG);
             mVideosResult = intent.getParcelableArrayListExtra(MainActivity.MOVIE_VIDEO_TAG);
-
         }
 
-        //set up the recycler view
-        mRecyclerView = (RecyclerView) findViewById(R.id.review_recycler_view);
-        mRecyclerView.setHasFixedSize(true);
-        ReviewAdapter reviewAdapter = new ReviewAdapter(this,mReviewsResult);
+        mDataBinding = DataBindingUtil.setContentView(this,R.layout.detail_activity);
 
-        //time for the layout manager
-        mLinearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        mRecyclerView.setAdapter(reviewAdapter);
-        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+
 
         buildMovieDetails();
     }
@@ -88,7 +78,4 @@ public class DetailActivity extends YouTubeBaseActivity {
     }
 
 
-    public void launchYoutubeTrailer(View view) {
-
-    }
 }
